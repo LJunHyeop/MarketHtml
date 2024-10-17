@@ -21,22 +21,44 @@ header {
 
 .picture {
     width: 100px; /* 이미지 크기 조정 */
-    height: 80px; /* 이미지 높이 조정 */
+    height: 60px; /* 이미지 높이 조정 */
     margin-right: 20px; /* 이미지와 제목 사이의 간격 */
     background-image: url('https://upload.wikimedia.org/wikipedia/commons/b/b2/Daangn_Signature_RGB.jpg');
     background-size: contain; /* 이미지가 div의 크기를 채우도록 설정 */
     background-position: center; /* 이미지 중앙 정렬 */
-    background-color: #ff6f20;
-    border-radius: 8px;
-    color :#ff6f20;
+    background-repeat: no-repeat; /* 이미지 반복 제거 */
 }
 
+h1 {
+    font-size: 25px; /* 글자 크기 설정 */
+    font-family: Arial, sans-serif; /* 폰트 설정 */
+    font-weight: bold; /* 글자 굵기 */
+    margin: 0; /* 여백 제거 */
+}
 
-main {
-    padding: 20px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+.UsedTrade {
+    width: 150px; /* 너비 설정 */
+    height: 50px; /* 높이 설정 */
+    background-color: transparent; /* 배경색 제거 */
+    color: gray; /* 기본 글자 색 */
+    font-size: 25px; /* 글자 크기 설정 */
+    font-family: Arial, sans-serif; /* 폰트 설정 */
+    border: none; /* 테두리 제거 */
+    border-radius: 8px; /* 둥근 모서리 */
+    cursor: pointer; /* 마우스 커서 변경 */
+    margin-left: 10px;
+    transition: color 0.3s ease, background-color 0.3s ease; /* 호버 시 부드러운 전환 */
+    font-weight: bold; /* 글자 굵기 */
+}
+
+.UsedTrade:hover {
+    color: white; /* 호버 시 글자 색상 변경 */
+    background-color: #ff6f20; /* 호버 시 배경색 설정 */
+}
+
+.UsedTrade:hover {
+    color: white; /* 호버 시 글자 색 변경 */
+    background-color: #ff6f20; /* 호버 시 배경색 설정 */
 }
 
 h2 {
@@ -47,6 +69,12 @@ h2 {
     margin-top: 20px;
 }
 
+main {
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
 .transaction {
     padding: 10px;
     border: 1px solid #ccc;
