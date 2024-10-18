@@ -1,40 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../api/axios'; // axios 인스턴스 임포트
+import { useNavigate } from 'react-router-dom'; // useNavigate 임포트
 import './LoginPage.css'; // CSS 파일 임포트
 
-const LoginPage = ({ onLogin }) => { // onLogin prop 추가
+const LoginPage = ({ onLogin }) => {
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
-    const [errorMessage, setErrorMessage] = useState(''); // 오류 메시지 상태 추가
+    const [errorMessage, setErrorMessage] = useState('');
+    const navigate = useNavigate(); // navigate 훅 사용
+
+    useEffect(() => {
+        setId('dkffkadl24@naver.com');
+        setPassword('Test1234!@#$');
+    }, []);
+
+    const isValidEmail = (email) => {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+    };
 
     const handleLogin = async () => {
-        setErrorMessage(''); // 로그인 시 이전 오류 메시지 초기화
-
-        // 입력값 검증
+        setErrorMessage('');
         if (!id || !password) {
             setErrorMessage('아이디와 비밀번호를 입력해 주세요.');
             return;
         }
-
-        // 로그인 시도 시 ID와 비밀번호 로그 출력
-        console.log("로그인 시도 ID:", id); 
-        console.log("로그인 시도 PW:", password);
+        if (!isValidEmail(id)) {
+            setErrorMessage('올바른 이메일 형식을 입력해 주세요.');
+            return;
+        }
 
         try {
             const response = await api.post('/api/user/sign-in', {
-                userEmail: id, // id 사용
-                userPw: password, // password 사용
+                userEmail: id,
+                userPw: password,
             });
-            console.log('로그인 성공:', response.data);
 
-            // JWT 토큰을 로컬 스토리지에 저장
-            localStorage.setItem('token', response.data.token); // 응답에서 토큰 키에 맞게 수정
-
-            // 로그인 후 페이지 이동 로직 추가
-            onLogin(); // 로그인 성공 시 onLogin 호출
+            // JWT 토큰을 localStorage에 저장
+            localStorage.setItem('token', response.data.accessToken); // token 확인
+            
+            onLogin(); // 로그인 성공 시 상태 변경
+            navigate('/home'); // 홈 페이지로 이동
         } catch (error) {
             console.error('로그인 실패:', error.response ? error.response.data : error.message);
-            setErrorMessage('로그인에 실패했습니다. 아이디와 비밀번호를 확인하세요.'); // 오류 메시지 설정
+            if (error.response) {
+                if (error.response.status === 401) {
+                    setErrorMessage('아이디와 비밀번호가 일치하지 않습니다.');
+                } else {
+                    setErrorMessage('로그인 중 오류가 발생했습니다.');
+                }
+            } else {
+                setErrorMessage('네트워크 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
+            }
         }
     };
 

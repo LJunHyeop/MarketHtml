@@ -1,11 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import './homepage.css'; // 스타일 시트 임포트
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Map from './Map'; // Map 컴포넌트 import 수정
+import './homepage.css';
 
-const HomePage = () => {
-    const [products, setProducts] = useState([]); // 상품 목록을 저장할 상태
+const HomePage = ({ onLogout }) => {
+    const [products, setProducts] = useState([]);
+    const [mannerTemperature, setMannerTemperature] = useState(null);
+    const [marker, setMarker] = useState(null);
+    const [address, setAddress] = useState('');
+    const navigate = useNavigate();
+
     const handleLogout = () => {
-        localStorage.removeItem('token'); // 로컬 스토리지에서 토큰 제거
-        window.location.reload(); // 페이지 새로고침
+        localStorage.removeItem('token');
+        onLogout();
+        navigate('/login');
     };
 
     const fetchProducts = async () => {
@@ -23,36 +31,40 @@ const HomePage = () => {
             }
 
             const data = await response.json();
-            setProducts(data); // 응답 데이터를 상태에 저장
+            setProducts(data);
         } catch (error) {
             console.error('Error fetching products:', error);
         }
     };
 
-    const handleUsedTradeClick = () => {
-        fetchProducts(); // API 호출
-    };
-
     useEffect(() => {
-        // 페이지가 로드될 때 토큰이 없으면 로그인 페이지로 리디렉션
         const token = localStorage.getItem('token');
         if (!token) {
-            window.location.href = '/login'; // 로그인 페이지 URL로 변경
+            navigate('/login');
+        } else {
+            fetchProducts();
         }
-    }, []);
+    }, [navigate]);
+
+    const handleStartAssessment = () => {
+        navigate('/assessment');
+    };
+
+    const handleAddTransaction = () => {
+        navigate('/product');
+    };
 
     return (
         <div className="container">
             <header>
-                <div className="picture"></div> {/* 이미지 표시를 위한 div 추가 */}
+                <div className="picture"></div>
                 <h1>당근마켓</h1>
-                <button class ="UsedTrade" onClick={handleUsedTradeClick}>중고거래</button> {/* 버튼 클릭 시 API 호출 */}
+                <button className="UsedTrade" onClick={fetchProducts}>중고거래</button>
             </header>
             <main>
                 <h2>환영합니다!</h2>
                 <p>당신의 최근 거래 내역:</p>
                 <div id="recent-transactions">
-                    {/* 거래 내역은 여기에 동적으로 추가됩니다. */}
                     {products.length > 0 ? (
                         <ul>
                             {products.map(product => (
@@ -63,9 +75,15 @@ const HomePage = () => {
                         <p>상품이 없습니다.</p>
                     )}
                 </div>
-                <button id="addTransactionButton">거래 추가하기</button>
+                <h3>상대 매너온도: {mannerTemperature ? `${mannerTemperature}°C` : '정보 없음'}</h3>
+                <button onClick={handleStartAssessment}>매너 평가하기</button>
+                <button onClick={handleAddTransaction}>거래 추가하기</button>
+                <button onClick={handleLogout}>로그아웃</button>
+
+                {/* Map 컴포넌트 추가 */}
+                <Map center={{ lat: 37.566826, lng: 126.9786567 }} /> {/* 서울시청의 위도와 경도 */}
+                <p>클릭한 위치의 주소: {address}</p>
             </main>
-            <button id="logoutButton" onClick={handleLogout}>로그아웃</button>
         </div>
     );
 };

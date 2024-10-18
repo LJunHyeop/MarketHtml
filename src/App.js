@@ -1,18 +1,32 @@
 import React, { useState } from 'react';
-import LoginPage from './components/LoginPage'; // LoginPage 컴포넌트 임포트
-import HomePage from './components/homepage'; // HomePage 컴포넌트 임포트
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import LoginPage from './components/LoginPage';
+import HomePage from './components/homepage';
+import Assessment from './components/assessment';
+import Product from './components/product';
 
 const App = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
+    const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem('token'));
 
     const handleLogin = () => {
-        setIsLoggedIn(true); // 로그인 시 상태 변경
+        setIsLoggedIn(true);
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        setIsLoggedIn(false);
     };
 
     return (
-        <div>
-            {isLoggedIn ? <HomePage /> : <LoginPage onLogin={handleLogin} />}
-        </div>
+        <Router>
+            <Routes>
+                <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+                <Route path="/home" element={isLoggedIn ? <HomePage onLogout={handleLogout} /> : <Navigate to="/login" />} />
+                <Route path="/assessment" element={isLoggedIn ? <Assessment onComplete={() => {}} /> : <Navigate to="/login" />} />
+                <Route path="/product" element={isLoggedIn ? <Product onComplete={() => {}} /> : <Navigate to="/login" />} />
+                <Route path="/" element={<Navigate to="/login" />} />
+            </Routes>
+        </Router>
     );
 };
 
